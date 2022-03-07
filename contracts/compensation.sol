@@ -1,5 +1,5 @@
 pragma solidity ^0.8.0;
-
+/*
       ______ ______
     _/      Y      \_
    // ~~ ~~ | ~~ ~  \\
@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
  //________.|.________\\     https://poseidonfinancexyz.com
 `----------`-'----------'
 
-
+*/
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
  */
@@ -91,12 +91,12 @@ contract PoseidonCompensation {
     address private owner;
     IERC20 private token;
     
-    mapping(address => uint256) public users;
+    mapping(address => uint) public users;
 
     constructor(
         IERC20 _token,
         address[] memory _addresses, 
-        uint256[] memory _amounts) {
+        uint[] memory _amounts) {
         token = _token;
         owner = msg.sender;
         addClaimer(_addresses,_amounts);
@@ -115,7 +115,7 @@ contract PoseidonCompensation {
     //
     // view function
     //
-    function compensation(address _address) public view returns(uint256) {
+    function compensation(address _address) public view returns(uint) {
         return users[_address];
     }
 
@@ -125,15 +125,15 @@ contract PoseidonCompensation {
 
     function burn() external {
         require(msg.sender == owner, "ERR: not owner");
-        token.approve(address(this), address(this).balance);
-        token.transferFrom(address(this), 0x000000000000000000000000000000000000dEaD, address(this).balance);
+        token.approve(address(this), token.balanceOf(address(this)));
+        token.transferFrom(address(this), 0x000000000000000000000000000000000000dEaD, token.balanceOf(address(this)));
     }
 
-    function addClaimer(address[] memory _addresses, uint256[] memory _amounts) public {
+    function addClaimer(address[] memory _addresses, uint[] memory _amounts) public {
         require(owner == msg.sender, "ERR: you are not the owner");
         require(_addresses.length == _amounts.length,"ERR: array diff size");
         for (uint256 i = 0; i < _addresses.length; i++) {
-            users[_addresses[i]] = _amounts[i];
+            users[_addresses[i]] = _amounts[i] * 10 ** 18;
         }
     }
 
